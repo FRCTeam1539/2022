@@ -1,0 +1,27 @@
+What needs to be programmed:
+
+Arm Up/Down
+    - Using Xbox D-pad Up and Down to expand and retract the arm.
+    - Motors will always be max (1 or -1) when moving the arm.
+
+
+Loader
+    - Left trigger or bumper on Xbox controller.
+
+Launcher
+    - Right trigger or bumper on Xbox controller.
+
+
+What needs to be tested (when we have a robot):
+
+1. Mechanum Drive
+2. Loader
+3. Launcher
+4. Arm Up/Down
+
+
+Completed items:
+
+- Framework for Mechanum drive (Thrustmaster joystick).
+- Framework for brake (Xbox controller B button).
+    - Brake is used by controller (Xbox) to prevent driver (joystick) from accidentally moving the robot once aligned for a shot.

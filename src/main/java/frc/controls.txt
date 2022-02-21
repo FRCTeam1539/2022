@@ -1,0 +1,33 @@
+Drive controls:
+
+The Thrustmaster joystick will be used for driving.
+
+Drive system will be Mechanum using CTRE Phoenix Framework Software for drive controls.
+
+X axis will move the robot left and right.
+
+Y axis will move the robot forward and backward.
+
+Z rotation will rotate the robot.
+
+
+Fire controls:
+
+The Xbox controller will be used for loading and firing the balls.
+
+Left bumper/trigger will handle load/intake operations.
+
+Right bumper/trigger will handle launch/fire operations.
+
+The B button will allow the controller to brake the drive motors in preparation for launch.
+
+
+Arm controls:
+
+The Xbox controller will be used for loading and firing the balls.
+
+The D-pad Up button will expand the arm out.
+
+The D-pad Down buttonw will contract/lower the arm down.
+
+The arm motors will always operate at maximum speed.
