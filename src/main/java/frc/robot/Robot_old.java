@@ -1,100 +1,102 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-    
+
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-//import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-//import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-
-//import java.io.Console;
-
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import edu.wpi.first.wpilibj.XboxController;
 
-/**
- * This is a demo program showing the use of the DifferentialDrive class, specifically it contains
- * the code necessary to operate a robot with tank drive.
- */
-public class Robot extends TimedRobot {
-  private DifferentialDrive m_myRobot;
-  private Joystick m_leftStick;
-  private Joystick m_rightStick;
-  private Timer timer;
 
-  private final WPI_VictorSPX m_leftMotor = new WPI_VictorSPX(11);
-  private final WPI_VictorSPX m_rightMotor = new WPI_VictorSPX(12);
+
+/** This is a demo program showing how to use Mecanum control with the MecanumDrive class. */
+public class Robot_old extends TimedRobot {
+  private static final int kFrontLeftChannel = 2;
+  private static final int kRearLeftChannel = 3;
+  private static final int kFrontRightChannel = 1;
+  private static final int kRearRightChannel = 0;
+
+  private static final int kJoystickChannel = 0;
+
+  private static final int kXboxChannel = 1;
+
+  private static final double MAX_Y_SPEED = 1.0;
+  private static final double MIN_Y_SPEED = -1.0;
+  private static final double MAX_X_SPEED = 1.0;
+  private static final double MIN_X_SPEED = -1.0;
+  private static final double MAX_Z_ROTATE = 1.0;
+  private static final double MIN_Z_ROTATE = -1.0;
+
+    WPI_VictorSPX frontLeft = new WPI_VictorSPX(kFrontLeftChannel);
+    WPI_VictorSPX rearLeft = new WPI_VictorSPX(kRearLeftChannel);
+    WPI_VictorSPX frontRight = new WPI_VictorSPX(kFrontRightChannel);
+    WPI_VictorSPX rearRight = new WPI_VictorSPX(kRearRightChannel);
+
+  
+  private MecanumDrive m_robotDrive;
+  private Joystick m_stick;
+  private XboxController m_Xbox;
 
   @Override
   public void robotInit() {
-    // We need to invert one side of the drivetrain so that positive voltages
-    // result in both sides moving forward. Depending on how your robot's
-    // gearbox is constructed, you might have to invert the left side instead.
-    m_rightMotor.setInverted(false);
-    m_leftMotor.setInverted(true);
-
-    m_leftStick = new Joystick(1);
-    m_rightStick = new Joystick(0);
-    m_myRobot = new DifferentialDrive(m_leftMotor, m_rightMotor);
-    timer = new Timer();
-    timer.reset();
-    timer.start();
-  }
-
-  public void simpleTankDrive(double left, double right) {
-    // If the right stick input is negative, invert the right motor
-    if (right < 0) m_rightMotor.setInverted(true);
-    else m_rightMotor.setInverted(false);
     
-    // If the left stick input is negative, invert the left motor
-    if (left < 0) m_leftMotor.setInverted(false);
-    else m_leftMotor.setInverted(true);
+    // Invert the right side motors.
+    // You may need to change or remove this to match your robot.
+    frontRight.setInverted(true);
+    rearRight.setInverted(true);
 
-    // Tank drive with absolute value of joystick inputs
-    m_myRobot.tankDrive(Math.abs(left), Math.abs(right));
+    m_robotDrive = new MecanumDrive(frontLeft, rearLeft, frontRight, rearRight);
+
+    m_stick = new Joystick(kJoystickChannel);
+
+    m_Xbox = new XboxController(kXboxChannel);
   }
-
-  /* * * * * * * *\
-  | Tele-Operated |
-  \* * * * * * * */
 
   @Override
   public void teleopPeriodic() {
-    // Drive the robot
-    simpleTankDrive(m_leftStick.getY(), m_rightStick.getY());
-    // Print the current match time
-    System.out.printf("Match Timer: %f\n",timer.get());
-  }
-  
-  /* * * * * * * *\
-  |  Autonomous   |
-  \* * * * * * * */
+    double xJoy = m_stick.getX();
+    double yJoy = m_stick.getY();
+    double zJoy = m_stick.getZ();
 
-  @Override
-  public void autonomousInit() {
-    timer.reset();
-    timer.start();
-  }
-
-  @Override
-  public void autonomousPeriodic() {
-    // Get the match time
-    System.out.printf("Match Timer: %f\n",timer.get());
-    // If autonomous period is over, stop early
-    if (timer.get() > 15.0) {
-      simpleTankDrive(0.0, 0.0);
-      return;
+    if (!m_Xbox.getBButton() || (xJoy != 0 && yJoy != 0 && zJoy != 0)){
+      jerryDrivesMech(xJoy, yJoy, zJoy);
     }
-    // Time-based driving
-    if     (timer.get() < 2.0) simpleTankDrive(0.5, 0.5);
-    else if (timer.get() < 3.0) simpleTankDrive(0.0, 0.0);
-    else if (timer.get() < 5.0) simpleTankDrive(-0.5, -0.5);
-    else if (timer.get() < 6.0) simpleTankDrive(0.0, 0.0);
-    else if (timer.get() < 8.0) simpleTankDrive(-0.49, 0.49);
-    else if (timer.get() < 9.0) simpleTankDrive(0.0, 0.0);
-    else if (timer.get() < 11.0) simpleTankDrive(0.49, -0.49);
+   else if(m_Xbox.getBButton()){
+     frontLeft.stopMotor();
+     frontRight.stopMotor();
+     rearLeft.stopMotor();
+     rearRight.stopMotor();
+   }
+    else{
+      jerryDrivesMech(0,0,0);
+    }
+    
   }
+
+  private void jerryDrivesMech(double xSpeed, double ySpeed, double zRotate){
+    // Limiting X, Y, and Z speed for the robot drive
+    xSpeed = clipRange(xSpeed, MIN_X_SPEED, MAX_X_SPEED); 
+    
+    ySpeed = clipRange(ySpeed, MIN_Y_SPEED, MAX_Y_SPEED);
+    
+    zRotate = clipRange(zRotate, MIN_Z_ROTATE, MAX_Z_ROTATE);
+
+    // Use the joystick X axis for lateral movement, Y axis for forward
+    // movement, and Z axis for rotation.
+    m_robotDrive.driveCartesian(xSpeed, ySpeed, zRotate, 0.0);
+  }
+
+  private double clipRange(double value, double min, double max){
+    if (value > 0 && value > max){
+      value = max;
+    }
+    if (value < 0 && value < min){
+      value = min;
+    }
+    return value;
+  }
+
 }

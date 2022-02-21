@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import edu.wpi.first.wpilibj.XboxController;
+
 
 
 /** This is a demo program showing how to use Mecanum control with the MecanumDrive class. */
@@ -19,6 +21,8 @@ public class Robot extends TimedRobot {
 
   private static final int kJoystickChannel = 0;
 
+  private static final int kXboxChannel = 1;
+
   private static final double MAX_Y_SPEED = 1.0;
   private static final double MIN_Y_SPEED = -1.0;
   private static final double MAX_X_SPEED = 1.0;
@@ -26,17 +30,18 @@ public class Robot extends TimedRobot {
   private static final double MAX_Z_ROTATE = 1.0;
   private static final double MIN_Z_ROTATE = -1.0;
 
-  
+  WPI_VictorSPX frontLeft = new WPI_VictorSPX(kFrontLeftChannel);
+  WPI_VictorSPX rearLeft = new WPI_VictorSPX(kRearLeftChannel);
+  WPI_VictorSPX frontRight = new WPI_VictorSPX(kFrontRightChannel);
+  WPI_VictorSPX rearRight = new WPI_VictorSPX(kRearRightChannel);
+
   private MecanumDrive m_robotDrive;
   private Joystick m_stick;
+  private XboxController m_Xbox;
 
   @Override
   public void robotInit() {
-    WPI_VictorSPX frontLeft = new WPI_VictorSPX(kFrontLeftChannel);
-    WPI_VictorSPX rearLeft = new WPI_VictorSPX(kRearLeftChannel);
-    WPI_VictorSPX frontRight = new WPI_VictorSPX(kFrontRightChannel);
-    WPI_VictorSPX rearRight = new WPI_VictorSPX(kRearRightChannel);
-
+    
     // Invert the right side motors.
     // You may need to change or remove this to match your robot.
     frontRight.setInverted(true);
@@ -45,6 +50,8 @@ public class Robot extends TimedRobot {
     m_robotDrive = new MecanumDrive(frontLeft, rearLeft, frontRight, rearRight);
 
     m_stick = new Joystick(kJoystickChannel);
+
+    m_Xbox = new XboxController(kXboxChannel);
   }
 
   @Override
@@ -53,9 +60,15 @@ public class Robot extends TimedRobot {
     double yJoy = m_stick.getY();
     double zJoy = m_stick.getZ();
 
-    if (xJoy != 0 && yJoy != 0 && zJoy != 0){
+    if (!m_Xbox.getBButton() || (xJoy != 0 && yJoy != 0 && zJoy != 0)){
       jerryDrivesMech(xJoy, yJoy, zJoy);
     }
+   else if(m_Xbox.getBButton()){
+     frontLeft.stopMotor();
+     frontRight.stopMotor();
+     rearLeft.stopMotor();
+     rearRight.stopMotor();
+   }
     else{
       jerryDrivesMech(0,0,0);
     }
@@ -64,29 +77,25 @@ public class Robot extends TimedRobot {
 
   private void jerryDrivesMech(double xSpeed, double ySpeed, double zRotate){
     // Limiting X, Y, and Z speed for the robot drive
-    if (xSpeed > 0 && xSpeed > MAX_X_SPEED){
-      xSpeed = MAX_X_SPEED;
-    }
-    if (xSpeed < 0 && xSpeed < MIN_X_SPEED){
-      xSpeed = MIN_X_SPEED;
-    }
-
-    if (ySpeed > 0 && ySpeed > MAX_Y_SPEED){
-      ySpeed = MAX_Y_SPEED;
-    }
-    if (ySpeed < 0 && ySpeed < MIN_Y_SPEED){
-      ySpeed = MIN_Y_SPEED;
-    }
-
-    if (zRotate > 0 && zRotate > MAX_Z_ROTATE){
-      zRotate = MAX_Z_ROTATE;
-    }
-    if ( zRotate < 0 && zRotate < MIN_Z_ROTATE){
-      zRotate = MIN_Z_ROTATE;
-    }
+    xSpeed = clipRange(xSpeed, MIN_X_SPEED, MAX_X_SPEED); 
+    
+    ySpeed = clipRange(ySpeed, MIN_Y_SPEED, MAX_Y_SPEED);
+    
+    zRotate = clipRange(zRotate, MIN_Z_ROTATE, MAX_Z_ROTATE);
 
     // Use the joystick X axis for lateral movement, Y axis for forward
     // movement, and Z axis for rotation.
     m_robotDrive.driveCartesian(xSpeed, ySpeed, zRotate, 0.0);
   }
+
+  private double clipRange(double value, double min, double max){
+    if (value > 0 && value > max){
+      value = max;
+    }
+    if (value < 0 && value < min){
+      value = min;
+    }
+    return value;
+  }
+
 }
