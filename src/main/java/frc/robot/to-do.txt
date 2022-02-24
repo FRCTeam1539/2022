@@ -5,9 +5,6 @@ Arm Up/Down
     - Motors will always be max (1 or -1) when moving the arm.
 
 
-Loader
-    - Left trigger or bumper on Xbox controller.
-
 Launcher
     - Right trigger or bumper on Xbox controller.
 
@@ -25,3 +22,5 @@ Completed items:
 - Framework for Mechanum drive (Thrustmaster joystick).
 - Framework for brake (Xbox controller B button).
     - Brake is used by controller (Xbox) to prevent driver (joystick) from accidentally moving the robot once aligned for a shot.
+- Loader
+    - Left trigger on Xbox controller.
