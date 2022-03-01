@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.Timer;
 
-import java.security.interfaces.XECPublicKey;
+//import java.security.interfaces.XECPublicKey;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.XboxController;
@@ -110,7 +110,6 @@ public class Robot extends TimedRobot {
     boolean xbcY = m_Xbox.getYButton();
     boolean xbcA = m_Xbox.getAButton();
     boolean xbcRB = m_Xbox.getRightBumper();
-    boolean xbcLB = m_Xbox.getLeftBumper();
     double xbcLeftStickY = m_Xbox.getLeftY();
     double xbcLeftStickX = m_Xbox.getLeftX();
     double xbcRightStickY = m_Xbox.getRightY();
@@ -199,9 +198,45 @@ public class Robot extends TimedRobot {
       m_launchMotor2.set(1.0);
     }
 
-    //analog stick manual drive
+    //left analog stick manual drive for front
     if (xbcLeftStickY < 0){
-      
+      m_ArmExtBack.setInverted(false);
+      m_ArmExtBack.set(m_Xbox.getLeftY());
+    }
+
+    if (xbcLeftStickY > 0){
+      m_ArmExtBack.setInverted(true);
+      m_ArmExtBack.set(m_Xbox.getLeftY());
+    }
+
+    if (xbcLeftStickX < 0){
+      m_ArmLiftBack.setInverted(false);
+      m_ArmLiftBack.set(m_Xbox.getLeftX());
+    }
+
+    if (xbcLeftStickX > 0){
+      m_ArmLiftBack.setInverted(true);
+      m_ArmLiftBack.set(m_Xbox.getLeftX());
+    }
+
+    //right analog stick manual drive for back
+    if (xbcRightStickY < 0){
+      m_ArmExtFront.setInverted(false);
+      m_ArmExtFront.set(m_Xbox.getRightY());
+    }
+    if (xbcRightStickY > 0){
+      m_ArmExtFront.setInverted(true);
+      m_ArmExtFront.set(m_Xbox.getRightY());
+    }
+
+    if (xbcRightStickX < 0){
+      m_ArmLiftFront.setInverted(false);
+      m_ArmLiftFront.set(m_Xbox.getRightX());
+    }
+
+    if (xbcRightStickX > 0){
+      m_ArmLiftFront.setInverted(true);
+      m_ArmLiftFront.set(m_Xbox.getRightX());
     }
 
 
