@@ -7,6 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
+import edu.wpi.first.wpilibj.Timer;
+
+import java.security.interfaces.XECPublicKey;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.XboxController;
 //import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -24,6 +28,14 @@ public class Robot extends TimedRobot {
   private static final int kFrontRightChannel = 1;
   private static final int kRearRightChannel = 0;
   private static final int kIntakeBeltChannel = 4;
+  private static final int kLaunchMotor1Channel = 5;
+  private static final int kLaunchMotor2Channel = 6;
+  private static final int kArmExtFrontChannel = 7;
+  private static final int kArmExtBackChannel = 8;
+  private static final int kArmLiftBackChannel = 9;
+  private static final int kArmLiftFrontChannel = 10;
+
+  
 
 
   // controller channels
@@ -38,6 +50,9 @@ public class Robot extends TimedRobot {
   private static final double MAX_Z_ROTATE = 1.0;
   private static final double MIN_Z_ROTATE = -1.0;
 
+  //launch motor speed 
+  private static final double LAUNCH_SPEED = 1.0;
+
   // mechanum motors
   private WPI_VictorSPX frontLeft = new WPI_VictorSPX(kFrontLeftChannel);
   private WPI_VictorSPX rearLeft = new WPI_VictorSPX(kRearLeftChannel);
@@ -46,7 +61,20 @@ public class Robot extends TimedRobot {
 
   // launch system motors
   private final WPI_VictorSPX m_intakeBeltMotor = new WPI_VictorSPX(kIntakeBeltChannel);
+  private final WPI_VictorSPX m_launchMotor1 = new WPI_VictorSPX(kLaunchMotor1Channel);
+  private final WPI_VictorSPX m_launchMotor2 = new WPI_VictorSPX(kLaunchMotor2Channel);
+  private final WPI_VictorSPX m_ArmExtFront = new  WPI_VictorSPX(kArmExtFrontChannel);
+  private final WPI_VictorSPX m_ArmExtBack = new  WPI_VictorSPX(kArmExtBackChannel);
+  private final WPI_VictorSPX m_ArmLiftFront = new  WPI_VictorSPX(kArmLiftFrontChannel);
+  private final WPI_VictorSPX m_ArmLiftBack = new  WPI_VictorSPX(kArmLiftBackChannel);
 
+  private boolean armUp = false;
+  private boolean armDown = true;
+  private double armUpTm = 1.0;
+  private Timer armTm = new Timer();
+  private double armDownTm = 1.0;
+  private boolean armMotionUp = false;
+  private boolean armMotionDown = false;
 
   private MecanumDrive m_robotDrive;
   //private  m_intakeBelt;
@@ -66,6 +94,9 @@ public class Robot extends TimedRobot {
     m_stick = new Joystick(kJoystickChannel);
 
     m_Xbox = new XboxController(kXboxChannel);
+
+    armTm.stop();
+    armTm.reset();
   }
 
   @Override
@@ -76,6 +107,14 @@ public class Robot extends TimedRobot {
     double zJoy = m_stick.getZ();
 
     boolean xbcB = m_Xbox.getBButton();
+    boolean xbcY = m_Xbox.getYButton();
+    boolean xbcA = m_Xbox.getAButton();
+    boolean xbcRB = m_Xbox.getRightBumper();
+    boolean xbcLB = m_Xbox.getLeftBumper();
+    double xbcLeftStickY = m_Xbox.getLeftY();
+    double xbcLeftStickX = m_Xbox.getLeftX();
+    double xbcRightStickY = m_Xbox.getRightY();
+    double xbcRightStickX = m_Xbox.getRightX();
 
     // drive controls
     if(xbcB){
@@ -104,19 +143,68 @@ public class Robot extends TimedRobot {
     */
 
     // intake belt controls
-    /* option 1
-    double intakeSpeed = m_Xbox.getLeftTriggerAxis();
-
+    // option 1
+    //double intakeSpeed = m_Xbox.getLeftTriggerAxis();
+/*
     if (intakeSpeed > 0) {
       m_intakeBeltMotor.set(intakeSpeed);
     }
     else {
       m_intakeBeltMotor.set(0);
-    */
+    }
+*/
 
     //option 2
     m_intakeBeltMotor.set(m_Xbox.getLeftTriggerAxis());
-    
+    m_launchMotor1.set(m_Xbox.getRightTriggerAxis());
+    m_launchMotor2.set(m_Xbox.getRightTriggerAxis());
+
+
+
+    //automatically move arm up
+    if (xbcY && !(armMotionUp || armMotionDown) && !armUp){
+      m_ArmExtBack.setInverted(false);
+      m_ArmExtFront.set(1.0);
+      m_ArmExtBack.setInverted(false);
+      m_ArmExtFront.set(1.0);
+      armTm.start();
+      armMotionUp = true;
+    }
+    else if (armMotionUp && armTm.get() >= armUpTm){
+      m_ArmExtFront.stopMotor();
+      m_ArmExtBack.stopMotor();
+      armTm.stop();
+      armTm.reset();
+      armMotionUp = false;
+    }
+
+    //automatically move arm down
+    if (xbcA && !(armMotionUp || armMotionDown) && !armDown){
+      m_ArmExtFront.setInverted(true);
+      m_ArmExtBack.setInverted(true);
+      armTm.start();
+      armMotionDown = true;
+    }
+    else if (armMotionDown && armTm.get() >= armDownTm){
+      m_ArmExtFront.stopMotor();
+      m_ArmExtBack.stopMotor();
+      armTm.stop();
+      armTm.reset();
+      armMotionDown = false;
+    }
+
+    //start the two launch motors
+    if (xbcRB){
+      m_launchMotor1.set(1.0);
+      m_launchMotor2.set(1.0);
+    }
+
+    //analog stick manual drive
+    if (xbcLeftStickY < 0){
+      
+    }
+
+
   }
 
   private void jerryDrivesMech(double xSpeed, double ySpeed, double zRotate){
