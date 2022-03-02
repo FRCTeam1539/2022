@@ -23,17 +23,19 @@ import edu.wpi.first.wpilibj.XboxController;
 /** This is a demo program showing how to use Mecanum control with the MecanumDrive class. */
 public class Robot extends TimedRobot {
   // motor channels
-  private static final int kRearRightChannel = 0;
-  private static final int kFrontRightChannel = 1;
-  private static final int kFrontLeftChannel = 2;
-  private static final int kRearLeftChannel = 3;
-  private static final int kIntakeBeltChannel = 4;
-  private static final int kLaunchMotor1Channel = 5;
-  private static final int kLaunchMotor2Channel = 6;
-  private static final int kArmExt1Channel = 7;
-  private static final int kArmExt2Channel = 8;
-  private static final int kArmLift1Channel = 9;
-  private static final int kArmLift2Channel = 10;
+  //right and left side when facing back of the robot
+  private static final int kRearRightChannel = 5;
+  private static final int kFrontRightChannel = 0;
+  private static final int kFrontLeftChannel = 11;
+  private static final int kRearLeftChannel = 6;
+  private static final int kIntakeBeltChannel = 8;
+  private static final int kLaunchMotorRChannel = 6;
+  private static final int kLaunchMotorLChannel = 9;
+  private static final int kArmExtRChannel = 4;
+  private static final int kArmExtLChannel = 7;
+  private static final int kArmLiftRChannel = 1;
+  private static final int kArmLiftLChannel = 10;
+  private static final int kHoodChannel = 5;
 
   
 
@@ -61,12 +63,12 @@ public class Robot extends TimedRobot {
 
   // launch system motors
   private final WPI_VictorSPX m_intakeBeltMotor = new WPI_VictorSPX(kIntakeBeltChannel);
-  private final WPI_VictorSPX m_launchMotor1 = new WPI_VictorSPX(kLaunchMotor1Channel);
-  private final WPI_VictorSPX m_launchMotor2 = new WPI_VictorSPX(kLaunchMotor2Channel);
-  private final WPI_VictorSPX m_ArmExt1 = new  WPI_VictorSPX(kArmExt1Channel);
-  private final WPI_VictorSPX m_ArmExt2 = new  WPI_VictorSPX(kArmExt2Channel);
-  private final WPI_VictorSPX m_ArmLift1 = new  WPI_VictorSPX(kArmLift1Channel);
-  private final WPI_VictorSPX m_ArmLift2 = new  WPI_VictorSPX(kArmLift2Channel);
+  private final WPI_VictorSPX m_launchMotorR = new WPI_VictorSPX(kLaunchMotorRChannel);
+  private final WPI_VictorSPX m_launchMotorL = new WPI_VictorSPX(kLaunchMotorLChannel);
+  private final WPI_VictorSPX m_ArmExtR = new  WPI_VictorSPX(kArmExtRChannel);
+  private final WPI_VictorSPX m_ArmExtL = new  WPI_VictorSPX(kArmExtLChannel);
+  private final WPI_VictorSPX m_ArmLiftR = new  WPI_VictorSPX(kArmLiftRChannel);
+  private final WPI_VictorSPX m_ArmLiftL = new  WPI_VictorSPX(kArmLiftLChannel);
 
   private boolean armUp = false;
   private boolean armDown = true;
@@ -110,8 +112,8 @@ public class Robot extends TimedRobot {
     boolean xbcY = m_Xbox.getYButton();
     boolean xbcA = m_Xbox.getAButton();
     boolean xbcRB = m_Xbox.getRightBumper();
-    double xbcLeftStickY = m_Xbox.getLeftY();
-    double xbcLeftStickX = m_Xbox.getLeftX();
+    //double xbcLeftStickY = m_Xbox.getLeftY();
+   //double xbcLeftStickX = m_Xbox.getLeftX();
     double xbcRightStickY = m_Xbox.getRightY();
     double xbcRightStickX = m_Xbox.getRightX();
 
@@ -155,23 +157,23 @@ public class Robot extends TimedRobot {
 
     //option 2
     m_intakeBeltMotor.set(m_Xbox.getLeftTriggerAxis());
-    m_launchMotor1.set(m_Xbox.getRightTriggerAxis());
-    m_launchMotor2.set(m_Xbox.getRightTriggerAxis());
+    m_launchMotorR.set(m_Xbox.getRightTriggerAxis());
+    m_launchMotorL.set(m_Xbox.getRightTriggerAxis());
 
 
 
     //automatically move arm up
     if (xbcY && !(armMotionUp || armMotionDown) && !armUp){
-      m_ArmExt1.setInverted(false);
-      m_ArmExt1.set(1.0);
-      m_ArmExt2.setInverted(false);
-      m_ArmExt2.set(1.0);
+      m_ArmExtR.setInverted(false);
+      m_ArmExtR.set(1.0);
+      m_ArmExtL.setInverted(false);
+      m_ArmExtL.set(1.0);
       armTm.start();
       armMotionUp = true;
     }
     else if (armMotionUp && armTm.get() >= armUpTm){
-      m_ArmExt1.stopMotor();
-      m_ArmExt2.stopMotor();
+      m_ArmExtR.stopMotor();
+      m_ArmExtL.stopMotor();
       armTm.stop();
       armTm.reset();
       armMotionUp = false;
@@ -179,14 +181,14 @@ public class Robot extends TimedRobot {
 
     //automatically move arm down
     if (xbcA && !(armMotionUp || armMotionDown) && !armDown){
-      m_ArmExt1.setInverted(true);
-      m_ArmExt2.setInverted(true);
+      m_ArmExtR.setInverted(true);
+      m_ArmExtL.setInverted(true);
       armTm.start();
       armMotionDown = true;
     }
     else if (armMotionDown && armTm.get() >= armDownTm){
-      m_ArmExt1.stopMotor();
-      m_ArmExt2.stopMotor();
+      m_ArmExtR.stopMotor();
+      m_ArmExtL.stopMotor();
       armTm.stop();
       armTm.reset();
       armMotionDown = false;
@@ -194,8 +196,8 @@ public class Robot extends TimedRobot {
 
     //start the two launch motors
     if (xbcRB){
-      m_launchMotor1.set(1.0);
-      m_launchMotor2.set(1.0);
+      m_launchMotorR.set(1.0);
+      m_launchMotorL.set(1.0);
     }
 /*
     //left analog stick manual drive for front
@@ -221,30 +223,30 @@ public class Robot extends TimedRobot {
 */
     //right analog stick manual drive for back
     if (xbcRightStickY < 0){
-      m_ArmExt1.setInverted(false);
-      m_ArmExt1.set(m_Xbox.getRightY());
-      m_ArmExt2.setInverted(false);
-      m_ArmExt2.set(m_Xbox.getRightY());
+      m_ArmExtR.setInverted(false);
+      m_ArmExtR.set(m_Xbox.getRightY());
+      m_ArmExtL.setInverted(false);
+      m_ArmExtL.set(m_Xbox.getRightY());
     }
     if (xbcRightStickY > 0){
-      m_ArmExt1.setInverted(true);
-      m_ArmExt1.set(m_Xbox.getRightY());
-      m_ArmExt2.setInverted(true);
-      m_ArmExt2.set(m_Xbox.getRightY());
+      m_ArmExtR.setInverted(true);
+      m_ArmExtR.set(m_Xbox.getRightY());
+      m_ArmExtL.setInverted(true);
+      m_ArmExtL.set(m_Xbox.getRightY());
     }
 
     if (xbcRightStickX < 0){
-      m_ArmLift1.setInverted(false);
-      m_ArmLift1.set(m_Xbox.getRightX());
-      m_ArmLift2.setInverted(false);
-      m_ArmLift2.set(m_Xbox.getRightX());
+      m_ArmLiftR.setInverted(false);
+      m_ArmLiftR.set(m_Xbox.getRightX());
+      m_ArmLiftL.setInverted(false);
+      m_ArmLiftL.set(m_Xbox.getRightX());
     }
 
     if (xbcRightStickX > 0){
-      m_ArmLift1.setInverted(true);
-      m_ArmLift1.set(m_Xbox.getRightX());
-      m_ArmLift2.setInverted(true);
-      m_ArmLift2.set(m_Xbox.getRightX());
+      m_ArmLiftR.setInverted(true);
+      m_ArmLiftR.set(m_Xbox.getRightX());
+      m_ArmLiftL.setInverted(true);
+      m_ArmLiftL.set(m_Xbox.getRightX());
     }
 
 
