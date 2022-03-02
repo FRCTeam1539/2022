@@ -27,36 +27,40 @@ public class Robot extends TimedRobot {
   /*
   built with asciiflow.com
 
-                                                          
-     ┌──────────┐                          ┌───────────────┤
-     │          │                          │               │
-     │          │                          │  ┌─────────── │
-     │          │                          │  │R Front Drv │
-     │          │                          │  │          │ │
-     │          │                          │  └──────────┘ │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          │                          │               │
-     │          └──────────────────────────┘               │
-     │                                                     │
-     │                                                     │
-     │                                                     │
-     │                                                     │
-     └─────────────────────────────────────────────────────┘
+                                  front
+       ┌──────────────────┐                  ┌────────────────────┐
+       │                  │                  │                    │
+       │ ┌──────────────┐ │                  │  ┌───────────────┐ │
+       │ │ L front drive│11                  │  │               │ │
+       │ │              │ │                  │  │ Rrdriveotor 0 │ │
+       │ └──────────────┘ │                  │  └───────────────┘ │
+       │                  │                  │                    │
+       │    ┌───────┐     │                  │     ┌───────┐      │
+       │    │       │     │                  │     │       │      │
+       │    │       │     │                  │     │       │      │
+       │    │L raise│10   │                  │     │raise 1│      │
+       │    │       │  ┌──┼──┐             ┌─┼─┐   │       │      │
+       │    │       │  │  │  │             │ │ │   │       │      │
+       │    └───────┘ L│launch 9          R│Launch 2───────┘      │
+       │               │  │  │             │ │ │                  │
+       │   ┌────────── └──┼──┘             └─┼─┘  ┌───────┐       │
+       │   │ intake belt 8│                  │    │hood 3 │       │
+       │   └──────────    │                  │    └───────┘       │
+       │                  │                  │                    │
+       │     ┌───────┐    │                  │      ┌─────┐       │
+       │     │       │    └──────────────────┘      │     │       │
+       │     │       │                              R Ext 4       │
+       │     │       │                              │     │       │
+       │     │L ext 7│                              ├─────┤       │
+       │     ├───────┤                         ┌────┴─────┴───┐   │
+       │  ┌──┴───────┴─────┐                   │              │   │
+       │  │                │                   │   R back drive 5 │
+       │  │ L back drive 6 │                   └───────────────   │
+       │  ├────────────────┤                                      │
+      ─┴──┴────────────────┴──────────────────────────────────────┘
 
+
+                                  back
 
 
 
@@ -66,13 +70,13 @@ public class Robot extends TimedRobot {
   private static final int kFrontLeftChannel = 11;
   private static final int kRearLeftChannel = 6;
   private static final int kIntakeBeltChannel = 8;
-  private static final int kLaunchMotorRChannel = 6;
+  private static final int kLaunchMotorRChannel = 2;
   private static final int kLaunchMotorLChannel = 9;
   private static final int kArmExtRChannel = 4;
   private static final int kArmExtLChannel = 7;
   private static final int kArmLiftRChannel = 1;
   private static final int kArmLiftLChannel = 10;
-  private static final int kHoodChannel = 5;
+  private static final int kHoodChannel = 3;
 
   
 
