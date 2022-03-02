@@ -24,6 +24,43 @@ import edu.wpi.first.wpilibj.XboxController;
 public class Robot extends TimedRobot {
   // motor channels
   //right and left side when facing back of the robot
+  /*
+  built with asciiflow.com
+
+                                                          
+     ┌──────────┐                          ┌───────────────┤
+     │          │                          │               │
+     │          │                          │  ┌─────────── │
+     │          │                          │  │R Front Drv │
+     │          │                          │  │          │ │
+     │          │                          │  └──────────┘ │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          │                          │               │
+     │          └──────────────────────────┘               │
+     │                                                     │
+     │                                                     │
+     │                                                     │
+     │                                                     │
+     └─────────────────────────────────────────────────────┘
+
+
+
+
+  */
   private static final int kRearRightChannel = 5;
   private static final int kFrontRightChannel = 0;
   private static final int kFrontLeftChannel = 11;
