@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.Timer;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 //import java.security.interfaces.XECPublicKey;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -32,7 +34,7 @@ public class Robot extends TimedRobot {
        │                  │                  │                    │
        │ ┌──────────────┐ │                  │  ┌───────────────┐ │
        │ │ L front drive│11                  │  │               │ │
-       │ │              │ │                  │  │ Rrdriveotor 0 │ │
+       │ │              │ │                  │  │ R drive motor 0 │
        │ └──────────────┘ │                  │  └───────────────┘ │
        │                  │                  │                    │
        │    ┌───────┐     │                  │     ┌───────┐      │
@@ -57,7 +59,7 @@ public class Robot extends TimedRobot {
        │  │                │                   │   R back drive 5 │
        │  │ L back drive 6 │                   └───────────────   │
        │  ├────────────────┤                                      │
-      ─┴──┴────────────────┴──────────────────────────────────────┘
+       ┴──┴────────────────┴──────────────────────────────────────┘
 
 
                                   back
@@ -65,18 +67,18 @@ public class Robot extends TimedRobot {
 
 
   */
-  private static final int kRearRightChannel = 5;
-  private static final int kFrontRightChannel = 0;
-  private static final int kFrontLeftChannel = 11;
-  private static final int kRearLeftChannel = 6;
+  private static final int kRearRightChannel = 4;
+  private static final int kFrontRightChannel = 2;
+  private static final int kFrontLeftChannel = 1;
+  private static final int kRearLeftChannel = 3;
   private static final int kIntakeBeltChannel = 8;
-  private static final int kLaunchMotorRChannel = 2;
+  private static final int kLaunchMotorRChannel = 2;//
   private static final int kLaunchMotorLChannel = 9;
-  private static final int kArmExtRChannel = 4;
+  private static final int kArmExtRChannel = 4;//
   private static final int kArmExtLChannel = 7;
-  private static final int kArmLiftRChannel = 1;
+  private static final int kArmLiftRChannel = 1;//
   private static final int kArmLiftLChannel = 10;
-  private static final int kHoodChannel = 3;
+  private static final int kHoodChannel = 3;//
 
   
 
@@ -97,10 +99,10 @@ public class Robot extends TimedRobot {
   private static final double LAUNCH_SPEED = 1.0;
 
   // mechanum motors
-  private WPI_VictorSPX frontLeft = new WPI_VictorSPX(kFrontLeftChannel);
-  private WPI_VictorSPX rearLeft = new WPI_VictorSPX(kRearLeftChannel);
-  private WPI_VictorSPX frontRight = new WPI_VictorSPX(kFrontRightChannel);
-  private WPI_VictorSPX rearRight = new WPI_VictorSPX(kRearRightChannel);
+  private WPI_TalonSRX frontLeft = new WPI_TalonSRX(kFrontLeftChannel);
+  private WPI_TalonSRX rearLeft = new WPI_TalonSRX(kRearLeftChannel);
+  private WPI_TalonSRX frontRight = new WPI_TalonSRX(kFrontRightChannel);
+  private WPI_TalonSRX rearRight = new WPI_TalonSRX(kRearRightChannel);
 
   // launch system motors
   private final WPI_VictorSPX m_intakeBeltMotor = new WPI_VictorSPX(kIntakeBeltChannel);
@@ -110,6 +112,7 @@ public class Robot extends TimedRobot {
   private final WPI_VictorSPX m_ArmExtL = new  WPI_VictorSPX(kArmExtLChannel);
   private final WPI_VictorSPX m_ArmLiftR = new  WPI_VictorSPX(kArmLiftRChannel);
   private final WPI_VictorSPX m_ArmLiftL = new  WPI_VictorSPX(kArmLiftLChannel);
+  private final WPI_VictorSPX m_Hood = new WPI_VictorSPX(kHoodChannel);
 
   private boolean armUp = false;
   private boolean armDown = true;
@@ -124,13 +127,16 @@ public class Robot extends TimedRobot {
   private Joystick m_stick;
   private XboxController m_Xbox;
 
+
   @Override
   public void robotInit() {
     
     // Invert the right side motors.
     // You may need to change or remove this to match your robot.
     frontRight.setInverted(true);
-    rearRight.setInverted(true);
+    rearRight.setInverted(false); 
+    rearLeft.setInverted(true);
+    frontLeft.setInverted(true);
 
     m_robotDrive = new MecanumDrive(frontLeft, rearLeft, frontRight, rearRight);
 
@@ -153,8 +159,8 @@ public class Robot extends TimedRobot {
     boolean xbcY = m_Xbox.getYButton();
     boolean xbcA = m_Xbox.getAButton();
     boolean xbcRB = m_Xbox.getRightBumper();
-    //double xbcLeftStickY = m_Xbox.getLeftY();
-   //double xbcLeftStickX = m_Xbox.getLeftX();
+    double xbcLeftStickY = m_Xbox.getLeftY();
+    double xbcLeftStickX = m_Xbox.getLeftX();
     double xbcRightStickY = m_Xbox.getRightY();
     double xbcRightStickX = m_Xbox.getRightX();
 
@@ -186,15 +192,15 @@ public class Robot extends TimedRobot {
 
     // intake belt controls
     // option 1
-    //double intakeSpeed = m_Xbox.getLeftTriggerAxis();
-/*
+    double intakeSpeed = m_Xbox.getLeftTriggerAxis();
+
     if (intakeSpeed > 0) {
       m_intakeBeltMotor.set(intakeSpeed);
     }
     else {
       m_intakeBeltMotor.set(0);
     }
-*/
+
 
     //option 2
     m_intakeBeltMotor.set(m_Xbox.getLeftTriggerAxis());
@@ -237,8 +243,8 @@ public class Robot extends TimedRobot {
 
     //start the two launch motors
     if (xbcRB){
-      m_launchMotorR.set(1.0);
-      m_launchMotorL.set(1.0);
+      //m_launchMotorR.set(LAUNCH_SPEED);
+      m_launchMotorL.set(LAUNCH_SPEED);
     }
 /*
     //left analog stick manual drive for front
@@ -263,6 +269,7 @@ public class Robot extends TimedRobot {
     }
 */
     //right analog stick manual drive for back
+    
     if (xbcRightStickY < 0){
       m_ArmExtR.setInverted(false);
       m_ArmExtR.set(m_Xbox.getRightY());
@@ -289,6 +296,15 @@ public class Robot extends TimedRobot {
       m_ArmLiftL.setInverted(true);
       m_ArmLiftL.set(m_Xbox.getRightX());
     }
+
+  if (xbcLeftStickY > 0){
+    m_Hood.setInverted(false);
+    m_Hood.set(m_Xbox.getLeftY());
+  }
+  if (xbcLeftStickY < 0){
+    m_Hood.setInverted(true);
+    m_Hood.set(m_Xbox.getLeftY());
+  }
 
 
   }
